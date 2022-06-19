@@ -37,6 +37,9 @@ A Api está padronizada para receber requisições de post e put
 somente através do [FromBody] ou seja o corpo vem somente pelo formato JSON.
 para aceitar requisições através de forms, será necessário alterar a assinatura dos mestodos para [FromForm]
 
+Se utilizado o postman para usar as requições: <br>
+caso seja exibido algum erro de SSL, desabilite a verificação em: File->settings->SSQL certificate verification(off)
+
 
 ## Credits
 - [Rodolfo J.Silva](https://github.com/lrodolfol) (Developer)
