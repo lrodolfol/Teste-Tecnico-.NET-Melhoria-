@@ -25,6 +25,7 @@ Além de padronizações de código para melhor leitura.
  - Utilize o console de gerenciador de pacotes do NuGet e rode os comando de migrations: 
 	- Add-Migration "migration"
 	- Update-Database
+ - Para facilitar os teste, utilize o arquivo CollectionRequests.json na raiz do projeto e faça importação no Postman.
 
 ### Possivels alterações necessárias
 A aplicação está rodando na porta padrão disponibilizada pela plataforma. Portas 5001 para https e 5000 para http.
