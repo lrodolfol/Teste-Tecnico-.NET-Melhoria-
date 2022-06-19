@@ -36,7 +36,7 @@ namespace todo_manager.Controllers
 
                 return CreatedAtAction(nameof(GetCard), new { id = todoCard.Id}, todoCard);
            }
-           catch(Exception ex)
+           catch(Exception)
            {
                return StatusCode(500);
            }
@@ -46,8 +46,8 @@ namespace todo_manager.Controllers
         [HttpGet]
         public IActionResult GetCard([FromQuery] string title)
         {
-            //List<Todo> cardsTodo = _context.Todo.ToList();
-            List<Todo> cardsTodo =
+            //utilizado para listar os Todos com prioridade de emergência
+            List<Todo> cardsTodo = 
                 (from todo in _context.Todo
                  orderby todo.IdPriority descending
                  select todo).ToList();
@@ -94,7 +94,7 @@ namespace todo_manager.Controllers
             {
                 _context.SaveChanges();
             }
-            catch(DbUpdateConcurrencyException)
+            catch(Exception)
             {
                 return StatusCode(500);
             }
