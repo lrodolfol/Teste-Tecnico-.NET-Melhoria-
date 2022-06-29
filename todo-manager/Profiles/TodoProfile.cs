@@ -9,6 +9,10 @@ namespace todo_manager.Profiles
         public TodoProfile()
         {
             CreateMap<CreateCardDto, Todo>();
+            CreateMap<Todo, CreateCardDto>();
+            CreateMap<Todo, ReadCardDto>()
+                .ForMember(dest => dest.Priority, map =>
+                map.MapFrom(src => src.Priority.Name));
         }
 
     }

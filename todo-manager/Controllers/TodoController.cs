@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using todo_manager.Interfaces;
 using todo_manager.Models.Data;
 using todo_manager.Models.Data.Dtos;
+using todo_manager.Models.Data.Interfaces;
 using todo_manager.Models.Entitie;
 
 namespace todo_manager.Controllers
@@ -15,107 +15,101 @@ namespace todo_manager.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase, ICardController
     {
-        private AppDbContext _context;
+        private CardContext _cardContext;
         private IMapper _mapper;
 
-        public TodoController(AppDbContext context, IMapper mapper)
+        public TodoController(CardContext cardContext, IMapper mapper)
         {
-            _context = context;
+            _cardContext = cardContext;
             _mapper = mapper;
         }
+
+        /* [HttpPut("{id}")]
+         public IActionResult PutCard(int id, CreateCardDto dtoCard)
+         {
+             Todo todoCard = _context.Todo.FirstOrDefault(t => t.Id == id);
+
+             if (todoCard == null)
+             {
+                 return NotFound();
+             }
+
+             todoCard = _mapper.Map(dtoCard, todoCard);
+
+             try
+             {
+                 _context.SaveChanges();
+             }
+             catch(Exception)
+             {
+                 return StatusCode(500);
+             }
+
+             return NoContent();
+         }*/
+
+        public IActionResult PutCard(int id, CreateCardDto dtoCard)
+        {
+            return NoContent();
+        }
+
+
 
         [HttpPost]
         public IActionResult PostCard([FromBody] CreateCardDto dtoCard)
         {
-           try
-           {    
-                var todoCard = _mapper.Map<Todo>(dtoCard);
+            try
+            {
+                _cardContext.CreateCard(dtoCard);
+                _cardContext.Save();
 
-                _context.Todo.Add(todoCard);
-                _context.SaveChanges();
+                Todo cardTodo = _mapper.Map<Todo>(dtoCard);
 
-                return CreatedAtAction(nameof(GetCard), new { id = todoCard.Id}, todoCard);
-           }
-           catch(Exception)
-           {
-               return StatusCode(500);
-           }
-            
+                ReadCardDto cardDto = _mapper.Map<ReadCardDto>(cardTodo);
+
+                return CreatedAtAction(nameof(GetCard), new { id = cardDto.Id }, cardDto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
         }
 
         [HttpGet]
         public IActionResult GetCard([FromQuery] string title)
         {
-            //utilizado para listar os Todos com prioridade de emergência
-            List<Todo> cardsTodo = 
-                (from todo in _context.Todo
-                 orderby todo.IdPriority descending
-                 select todo).ToList();
+            var cardsDto = _cardContext.GetCard(title);
 
-            if (! string.IsNullOrEmpty(title))
-            {
-                var query = 
-                    (from t in cardsTodo
-                     where t.title == title
-                     select t).ToList();
-
-                cardsTodo = query.ToList();
-            }
-
-            return Ok(cardsTodo);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetCard(int id)
-        {
-            Todo cardTodo = _context.Todo.FirstOrDefault(t => t.Id == id);
-
-            if (cardTodo == null) 
-            {
-                return NotFound();
-            }
-
-            return Ok(cardTodo);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult PutCard(int id, CreateCardDto dtoCard)
-        {
-            Todo todoCard = _context.Todo.FirstOrDefault(t => t.Id == id);
-
-            if (todoCard == null)
-            {
-                return NotFound();
-            }
-
-            todoCard = _mapper.Map(dtoCard, todoCard);
-
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch(Exception)
-            {
-                return StatusCode(500);
-            }
-
-            return NoContent();
+            return Ok(cardsDto);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteCard(int id)
         {
-            var todo = _context.Todo.FirstOrDefault(t => t.Id == id);
-
-            if (todo == null)
+            if(!_cardContext.DeleteCard(id))
             {
                 return NotFound();
             }
 
-            _context.Todo.Remove(todo);
-            _context.SaveChanges();
+            _cardContext.Save();
 
             return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetCard(int id)
+        {
+            var cardTodo = _cardContext.GetCard(id);
+
+            if (cardTodo == null)
+            {
+                return NotFound();
+            }
+
+            ReadCardDto readCardDto = _mapper.Map<ReadCardDto>(cardTodo);
+
+            return Ok(readCardDto);
         }
     }
 }

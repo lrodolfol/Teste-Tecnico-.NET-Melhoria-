@@ -2,7 +2,7 @@
 using todo_manager.Models.Data.Dtos;
 using todo_manager.Models.Entitie;
 
-namespace todo_manager.Interfaces
+namespace todo_manager.Models.Data.Interfaces
 {
     public interface ICardController
     {
